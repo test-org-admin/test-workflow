@@ -5,6 +5,7 @@ on:
 jobs:
   build:
     name: 'Run Functional Tests'
+    permissions: write-all
     runs-on: ubuntu-latest
     env: 
       FUNCTIONAL_TEST_APP_ID: 428394
