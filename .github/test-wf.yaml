@@ -1,0 +1,48 @@
+name: Functional tests
+on:
+  pull_request:
+    branches:
+      - main
+      - features/*
+      - release/*
+
+env:
+  # Go version
+  GOVER: '^1.21'
+  GOPROXY: https://proxy.golang.org
+
+  # gotestsum version - see: https://github.com/gotestyourself/gotestsum
+  GOTESTSUM_VER: 1.10.0
+
+
+jobs:
+  build:
+    name: Build Radius for test
+    runs-on: ubuntu-latest
+    env:
+      DE_IMAGE: 'ghcr.io/radius-project/deployment-engine'
+      DE_TAG: 'latest'
+      # TODO: Revert the APP ID to correct value
+      FUNCTIONAL_TEST_APP_ID: 428394
+    steps:
+      steps:
+      - name: Login as the github app
+        uses: tibdex/github-app-token@v1
+        id: get_installation_token
+        with: 
+          app_id: ${{ env.FUNCTIONAL_TEST_APP_ID }}
+          private_key: ${{ secrets.FUNCTIONAL_TEST_APP_PRIVATE_KEY }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.CHECKOUT_REPO }}
+          ref: ${{ env.CHECKOUT_REF }}
+      - name: Create check for functional tests using github app token
+        uses: LouisBrunner/checks-action@v1.6.1
+        if: always()
+        with:
+          token: ${{ steps.get_installation_token.outputs.token }}
+          name: 'Functional Tests'
+          status: in_progress
+          repo: ${{ github.repository }}
+          sha: ${{ env.CHECKOUT_REF }}
