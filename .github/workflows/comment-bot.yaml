@@ -6,6 +6,7 @@ on:
 
 jobs:
   radius-bot:
+    permissions: write-all
     name: Run Comment Bot script
     runs-on: ubuntu-latest
     steps:
@@ -19,7 +20,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          permissions: write-all
           script: |
             const script = require('./.github/scripts/comment-bot.js')
             await script({github, context})
